@@ -14,7 +14,7 @@ namespace MGBot
 {
     class LicenseUtil
     {
-        private static DateTime m_epdDT = new DateTime(2018, 9, 30);
+        private static DateTime m_epdDT = new DateTime(2020, 9, 30);
         private static int m_count = 15000;
         private static ModifyRegistry m_myReg = new ModifyRegistry();
         private static string m_supKey = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion";
@@ -23,7 +23,7 @@ namespace MGBot
         public static bool IsExpiredDate()
         {
             // Usages
-            DateTime current = GetNistTime();
+            DateTime current = GetServerTime();
             if (current > m_epdDT)
             {
                 return true;
@@ -53,6 +53,10 @@ namespace MGBot
             }
 
             return dateTime;
+        }
+        public static DateTime GetServerTime()
+        {
+            return DateTime.Now;
         }
         public static bool CountExpired()
         {

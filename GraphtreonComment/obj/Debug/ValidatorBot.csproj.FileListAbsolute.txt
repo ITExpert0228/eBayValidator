@@ -19,3 +19,4 @@ D:\04_Work\eBayValidator\GraphtreonComment\obj\Debug\ValidatorBot.csproj.CoreCom
 D:\04_Work\eBayValidator\GraphtreonComment\obj\Debug\ValidatorBot.csproj.CopyComplete
 D:\04_Work\eBayValidator\GraphtreonComment\obj\Debug\eBayValidator.exe
 D:\04_Work\eBayValidator\GraphtreonComment\obj\Debug\eBayValidator.pdb
+D:\04_Work\eBayValidator\GraphtreonComment\obj\Debug\ValidatorBot.csprojAssemblyReference.cache

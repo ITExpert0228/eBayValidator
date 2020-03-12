@@ -91,9 +91,10 @@ namespace MGBot
             radLogin.Select();
             Load_AccountList();
             Load_UAlist();
-           // LoadUrls();
-            go("about:config");
+            // LoadUrls();
+            //go("about:config");
             //goLogin();
+            go("https://reg.ebay.com/reg/PartialReg");
         }
         public void LoadScript(string[] args)
         {
@@ -1842,6 +1843,7 @@ namespace MGBot
             if (start > end) return;
 
             //Inspecting accounts
+            string cc = "https://reg.ebay.com/reg/PartialReg";
 
             for (int i = start - 1; i < end && IsRunning; i++)
             {
@@ -1853,7 +1855,6 @@ namespace MGBot
                 ua = tblUA.Rows.Count - 1 > 0 ? tblUA.Rows[k % (tblUA.Rows.Count - 1)].Cells[0].Value.ToString() : "";
                 setUA(ua);
                 // Login
-                string cc = "https://secure.moneygram.com/mgo/us/en/account/mandatory-signUp";
                 int res = DoRegister(strEmail, strPass, cc);
                 string[] row_t = new string[5];
                 row_t[0] = (i + 1).ToString();
@@ -1877,9 +1878,9 @@ namespace MGBot
                     //if (res == LOGIN_ERROR)
                         //SessionTimeout(Int32.Parse(txtTimeout.Text));
                     i = i - 1;
-                    ua = tblUA.Rows.Count - 1 > 0 ? tblUA.Rows[k % (tblUA.Rows.Count - 1)].Cells[0].Value.ToString() : "";
-                    setUA(ua);
-                    RemoveAllCache();
+                    //ua = tblUA.Rows.Count - 1 > 0 ? tblUA.Rows[k % (tblUA.Rows.Count - 1)].Cells[0].Value.ToString() : "";
+                    //setUA(ua);
+                    //RemoveAllCache();
                     goRegister(cc);
                     continue;
                 }
@@ -1957,31 +1958,19 @@ namespace MGBot
             while(true)
             {
                 //Loading
-                sleep(1, true);
-                string html = extract("//*[@id='ng-app']/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[12]", "html");
-                if (String.IsNullOrEmpty(html) == true) break;
+                sleep(2, true);
+                string html = extract("//*[@id='email_w']", "text");
+                if (String.IsNullOrEmpty(html) == false) break;
             }
-            Logging("Starting to Register.....");
+            Logging("Ready for checking.....");
             //sleep(100, true);
             try
             {
                 /*
-                fill("//*[@id='email']", "hanse@gmail.com");
-                sleep(1, true);
-                fill("//*[@id='password']", "password");
-                sleep(1, true);
-                fill("//*[@id='confirmPassword']", "password");
-                sleep(1, true);
-                click("//*[@id='primaryActionButton']");
-
-                var text = extract("//*[@id='registrationForm']/div[1]/div[1]/span[1]", "text");
-                alert(text);
-
-                //Detection of session expired
-                var html = extract("//*[@id='ok-modal']/div[2]/div[1]/div[1]/div[2]/div[1]", "html");
-                alert(html);
-                var html = extract("//*[@id='closeButton']", "html");
-                alert(html);
+                    text = extract("//*[@id='email_w']", "text");
+                    fill("//*[@id='email']", "test@test.com");
+                    fill("//*[@id='firstname']", "1");
+                    click("//*[@id='firstname']");
                 */
 
 
@@ -1996,81 +1985,50 @@ namespace MGBot
                 commentTextArea.ScrollIntoView(false);
                 StartTypingThread(child2handle, em);
                 sleep(0.1, true);
-
-                //Focus on Password
-                fill("//*[@id='password']", "");
-                commentTextArea = (GeckoHtmlElement)wb.Document.EvaluateXPath("//*[@id='password']").GetSingleNodeValue();
-                commentTextArea.Focus();
-                commentTextArea.ScrollIntoView(false);
-                StartTypingThread(child2handle, pwd);
-                sleep(0.1, true);
-
-                //Focus on Password Confrim
-                fill("//*[@id='confirmPassword']", "");
-                commentTextArea = (GeckoHtmlElement)wb.Document.EvaluateXPath("//*[@id='confirmPassword']").GetSingleNodeValue();
-                commentTextArea.Focus();
-                commentTextArea.ScrollIntoView(false);
-                StartTypingThread(child2handle, pwd);
-                sleep(0.1, true);
-
-                // Click continue:
-                click("//*[@id='primaryActionButton']");
-                PressEnter(child2handle);
-
+                //Focus on Firstname
+                fill("//*[@id='firstname']", "");
+                click("//*[@id='firstname']");
+                sleep(1, true);
             }
             catch
             {
                 return LOGIN_ERROR;
             }
             //The first fail checking
-            bool isNotify = false; int cnt = 0;
-            string unreg = "", reg = "";
-            Logging("----- Veriying the account: " + em);
+            Logging("----- Validating: " + em);
 
-            Random rnd = new Random();
+            string regresult = "";
+            int cnt = 0;
+            string email = extract("//*[@id='email']", "html");
+            int limit = 3;
 
-            while (!isNotify)
+            while (true)
             {
-                sleep(1, true);
-                Logging("-----" + $" [{cnt + 1}] " + "Checking notification and validation...");
-                //Unregistered
-                unreg = extract("//*[@id='registrationForm']/div[1]/div[1]/span[1]", "text");
-                //Registered
-                reg = extract("//*[@id='modalDismissButton']", "html");
-
-                if (!String.IsNullOrEmpty(unreg)) return LOGIN_FAIL;
-
-                isNotify = !String.IsNullOrEmpty(reg);
-
-                if(isNotify)
-                {
-                    click("//*[@id='modalDismissButton']");
-                    while (true)
-                    {
-                        //Loading
-                        sleep(1, true);
-                        string html = extract("//*[@id='ng-app']/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[12]", "html");
-                        if (String.IsNullOrEmpty(html) == true) break;
-                    }
-                    return LOGIN_SUCCESS;
-
-                }
                 cnt++;
-                //int limit = rnd.Next(0, 3);
-                int limit = 5;
-                if (isNotify == false && cnt > limit)
-                    break;
+                sleep(1, true);
+                Logging("-----" + $" [{cnt}] " + "Checking notification and validation...");
+                regresult = extract("//*[@id='email_w']", "text");
+
+                if (regresult.IndexOf("already") > 0)
+                    return LOGIN_SUCCESS;
+                else if (regresult.IndexOf("wrong") > 0)
+                    return LOGIN_INVALID;
+                if (String.IsNullOrEmpty(regresult))
+                    return LOGIN_ERROR;
+                if(String.IsNullOrEmpty(email))
+                    return LOGIN_ERROR;
+                if (regresult.IndexOf("enter") > 0 && cnt > limit)
+                    return LOGIN_FAIL;
             }
-            return LOGIN_ERROR;
         }
 
 
         private void RemoveAllCache()
         {
-            nsICookieManager CookieMan;
-            CookieMan = Xpcom.GetService<nsICookieManager>("@mozilla.org/cookiemanager;1");
-            CookieMan = Xpcom.QueryInterface<nsICookieManager>(CookieMan);
-            CookieMan.RemoveAll();
+            //nsICookieManager CookieMan;
+            //CookieMan = Xpcom.GetService<nsICookieManager>("@mozilla.org/cookiemanager;1");
+            //CookieMan = Xpcom.QueryInterface<nsICookieManager>(CookieMan);
+            //CookieMan.RemoveAll();
             //GeckoWebBrowser geckobrowser;
             //geckobrowser = (GeckoWebBrowser)GetCurrentWB();
             //            geckobrowser.Dispose();
@@ -2080,8 +2038,8 @@ namespace MGBot
             //                File.Delete(file);
 
             //           CallBackWinAppWebBrowser();
-            var path = Application.StartupPath + "\\Firefox";
-            Xpcom.Initialize(path);
+            //var path = Application.StartupPath + "\\Firefox";
+            //Xpcom.Initialize(path);
         }
     private void goRegister(string surl)
         {
@@ -2093,27 +2051,6 @@ namespace MGBot
             if (String.IsNullOrEmpty(lg)) return;
             lstLog.Items.Add(lg + Environment.NewLine);
             File.AppendAllText(Application.StartupPath + "\\export\\" + logfile, lg+ Environment.NewLine);
-        }
-        private void SessionTimeout(int minutes = 30)
-        {
-            DateTime start = DateTime.Now;
-            go("https://secure.moneygram.com/mgo/us/en/account/mandatory-signUp");
-            sleep(10, true);
-            while (true) {
-                sleep(1, true);
-                GeckoWebBrowser wb; string curUrl;
-                wb = (GeckoWebBrowser)GetCurrentWB();
-                curUrl = wb.Url.AbsoluteUri;
-                if (curUrl.IndexOf("session-expired.html") >= 0)
-                {
-                    break;
-                }
-                TimeSpan ts = DateTime.Now - start;
-                if (ts.TotalSeconds > Int32.Parse(txtTimeout.Text) * 60)
-                {
-                    break;
-                }
-            }
         }
         #endregion
         #region Event Handlers
@@ -2230,16 +2167,9 @@ namespace MGBot
         }
         private bool CheckURL(string surl)
         {
-            if (surl.IndexOf("mandatory-signUp") > 0)
+            if (surl.IndexOf("PartialReg") > 0)
                 return true;
             return false;
-            /*
-            else if (surl.IndexOf("app/login") > 0)
-                return NEW_URL;
-            else if (surl.IndexOf("app/register") > 0)
-                return NEW_REG_URL;
-                return 0;
-                */
         }
 
         private void setUA(string ua)
